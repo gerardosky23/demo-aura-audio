@@ -53,3 +53,11 @@ Para garantizar una experiencia idéntica en Firefox, Safari y navegadores basad
 3. **Manejo de Video y Media Autoplay:**
    - En Firefox y navegadores móviles con políticas estrictas de ahorro de datos, los elementos `<video>` deben incluir obligatoriamente los atributos `muted playsinline autoplay loop preload="auto"` y un atributo `poster` estático de alta fidelidad.
    - La llamada `.play()` debe ser siempre gestionada de forma segura mediante promesa (`playPromise.catch(() => {})`) para evitar excepciones por políticas de autoplay del navegador.
+
+## 6. Protocolo Obligatorio de Despliegue CI/CD y Push a GitHub (Dokploy)
+Queda estrictamente establecido que cada vez que el usuario ordene realizar un `push` a GitHub, el agente DEBE ejecutar rigurosamente este flujo sin excepción:
+1. **Verificación Pre-vuelo (Preflight Build):** Ejecutar `npm run build` localmente y verificar 0 errores de compilación y tipado antes de cualquier commit.
+2. **Integridad de Contenedorización:** Asegurar que `Dockerfile` (multi-stage Node 20 Builder + Nginx Alpine Runner), `.dockerignore` y `nginx.conf` estén presentes, actualizados y sin rutas rotas.
+3. **Prueba de Build Docker Local:** Si el Docker daemon está activo en el entorno, ejecutar `docker build -t <project>:test .` para garantizar que la imagen compilará sin fallos en el servidor Dokploy.
+4. **Staging y Commit Semántico:** Preparar los archivos (`git add .`), verificar el árbol (`git status`) y generar un commit convencional descriptivo (`feat:`, `fix:`, `refactor:`, `chore:`).
+5. **Push a la Rama Principal:** Ejecutar `git push origin main` para disparar el Webhook de Dokploy, iniciando el despliegue automático continuo con cero downtime.
